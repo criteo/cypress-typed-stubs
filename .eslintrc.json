@@ -1,0 +1,43 @@
+{
+  "root": true,
+  "ignorePatterns": ["dist", "coverage"],
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "plugins": ["simple-import-sort", "eslint-plugin-padding"],
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "parserOptions": {
+        "project": ["tsconfig.json"],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended"
+      ],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "error",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/prefer-readonly": "error",
+        "@typescript-eslint/naming-convention": ["error", { "selector": "interface", "format": ["PascalCase"] }],
+        "no-restricted-imports": ["error", { "patterns": [".."] }],
+        "padding/spacing": [
+          "error",
+          { "blankLine": "always", "prev": "export class", "next": "*" },
+          { "blankLine": "always", "prev": "export interface", "next": "*" },
+          { "blankLine": "always", "prev": "class", "next": "*" },
+          { "blankLine": "always", "prev": "interface", "next": "*" }
+        ],
+        "simple-import-sort/exports": "error",
+        "simple-import-sort/imports": ["error", { "groups": [["^\\u0000", "^@?\\w", "^[^.]", "^\\."]] }]
+      }
+    },
+    {
+      "files": ["*.html"],
+      "extends": ["plugin:prettier/recommended"],
+      "rules": {}
+    }
+  ]
+}
