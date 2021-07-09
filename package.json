@@ -2,6 +2,8 @@
   "name": "cypress-typed-stubs",
   "version": "1.0.0",
   "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "ng": "ng",
@@ -17,6 +19,7 @@
   },
   "peerDependencies": {
     "@angular/common": ">= 11",
+    "@angular/core": ">= 11",
     "cypress": ">= 6"
   },
   "devDependencies": {
