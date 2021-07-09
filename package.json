@@ -6,9 +6,8 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "lint": "ng lint",
-    "lint:fix": "ng lint --fix",
-    "ng": "ng",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
     "prettier": "prettier --list-different \"./**/*.{ts,json}\"",
     "prettier:fix": "prettier --write \"./**/*.{ts,json}\"",
     "style:check": "npm run lint && npm run prettier",
