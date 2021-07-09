@@ -1,24 +1,12 @@
-import { GenericStaticResponse, HttpRequestInterceptor } from 'cypress/types/net-stubbing';
-import { AbstractEndpoint } from './endpoint';
-import { RouteConfig } from './routing';
+import {GenericStaticResponse, HttpRequestInterceptor} from 'cypress/types/net-stubbing';
+import {AbstractEndpoint} from './endpoint';
+import {RouteConfig} from './routing';
 import Chainable = Cypress.Chainable;
-
-export type Headers = { [key: string]: string };
 
 /**
  * Helper class to help using the endpoints with Cypress
  */
 export class EndpointHelper {
-  private static headers: Headers = {};
-
-  /**
-   * Set the list of headers that will be provided with each stub
-   * @param headers
-   */
-  static initHeaders(headers: Headers): void {
-    EndpointHelper.headers = { ...headers };
-  }
-
   /**
    * Intercept an endpoint
    * @param routeConfig
@@ -35,7 +23,7 @@ export class EndpointHelper {
       const response: GenericStaticResponse<string, OUT> = {
         body,
         statusCode: route.status,
-        headers: EndpointHelper.headers,
+        headers: route.headers,
       };
       if (route.onResponse) {
         req.on('response', (res) => route.onResponse?.(res.body));

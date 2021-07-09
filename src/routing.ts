@@ -38,6 +38,8 @@ export type Method =
   | 'unlock'
   | 'unsubscribe';
 
+export type Headers = { [key: string]: string };
+
 /**
  * A route == an HTTP method and a URL.
  * Copied from Cypress.RouteOptions
@@ -62,6 +64,7 @@ export interface StubbedRoute<OUT> extends Route {
   response: OUT;
   status: number;
   onResponse?: (body: unknown) => void;
+  headers?: Headers;
 }
 
 export class RouteConfig<OUT> {
@@ -72,7 +75,8 @@ export class RouteConfig<OUT> {
     // Used to keep track for smokejs fixtures
     public _originalUrlForSmokeJS: string,
     private status: number,
-    private fixture: OUT
+    private fixture: OUT,
+    private headers: Headers = {}
   ) {}
 
   get route(): StubbedRoute<OUT> {
@@ -84,6 +88,7 @@ export class RouteConfig<OUT> {
       url: this.url,
       method: this.method,
       status: this.status,
+      headers: this.headers,
       response: fixture,
       onResponse: (body: unknown) => {
         const logRequest = (parsedBody: unknown) => {
@@ -111,6 +116,9 @@ export class RouteConfig<OUT> {
     };
   }
 
+  /**
+   * Simple route used to spy, not for stubbing
+   */
   get routeWithoutStub(): Route {
     return {
       url: this.url,
@@ -118,6 +126,9 @@ export class RouteConfig<OUT> {
     };
   }
 
+  /**
+   * Alias used to wait on the route
+   */
   get alias(): string {
     return '@' + this.name;
   }
@@ -138,6 +149,16 @@ export class RouteConfig<OUT> {
    */
   withOverride(override: Partial<OUT>): this {
     this.fixture = RouteConfig.mergeFixtures(this.fixture, override);
+
+    return this;
+  }
+
+  /**
+   * Set specific HTTP headers to be returned with the response
+   * @param headers
+   */
+  withHeaders(headers: Headers): this {
+    this.headers = {...headers};
 
     return this;
   }
