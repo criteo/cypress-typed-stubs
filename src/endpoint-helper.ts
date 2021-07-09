@@ -1,6 +1,6 @@
-import {GenericStaticResponse, HttpRequestInterceptor} from 'cypress/types/net-stubbing';
-import {AbstractEndpoint} from './endpoint';
-import {RouteConfig} from './routing';
+import { GenericStaticResponse, HttpRequestInterceptor } from 'cypress/types/net-stubbing';
+import { AbstractEndpoint } from './endpoint';
+import { RouteConfig } from './routing';
 import Chainable = Cypress.Chainable;
 
 /**
@@ -16,9 +16,9 @@ export class EndpointHelper {
     const interceptor: HttpRequestInterceptor = (req) => {
       // For some reason Cypress doesn't handle scalar types correctly.
       // They have to be turned into strings otherwise it will fail with an exception and stop the test immediately
-      const body = (typeof route.response == 'object'
-        ? route.response
-        : (('"' + route.response + '"') as unknown)) as OUT;
+      const body = (
+        typeof route.response == 'object' ? route.response : (('"' + route.response + '"') as unknown)
+      ) as OUT;
 
       const response: GenericStaticResponse<string, OUT> = {
         body,

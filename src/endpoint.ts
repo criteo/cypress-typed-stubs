@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
-import { Method, RouteConfig } from './routing';
+import { Headers, Method, RouteConfig } from './routing';
 import { SpyHttpClient } from './spy-http-client';
 
 /**
@@ -13,7 +13,7 @@ export abstract class AbstractEndpoint<IN, OUT> {
 
   endpointName!: string;
 
-  protected constructor(private readonly parentName: string) {}
+  protected constructor(private readonly parentName: string, protected headers: Headers = {}) {}
 
   get routeName(): string {
     return `${this.parentName}#${this.endpointName}`;
@@ -64,9 +64,10 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
     private readonly actualEndpoint: (...params: IN[]) => Observable<OUT>,
     parentName: string,
     public statusCode: number,
-    public fixture: OUT
+    public fixture: OUT,
+    headers: Headers = {}
   ) {
-    super(parentName);
+    super(parentName, headers);
   }
 
   defaultConfig(...userParams: IN[]): RouteConfig<OUT> {
@@ -81,7 +82,7 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
         return userParams[index];
       }
 
-      return (SpyHttpClient.addPlaceholder(paramName) as unknown) as IN;
+      return SpyHttpClient.addPlaceholder(paramName) as unknown as IN;
     });
 
     try {
@@ -103,7 +104,8 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
       // Make sure each call to RouteConfig is "pure"
       // in the sense each call to defaultConfig always return the original fixture,
       // not one that has been modified by a previous call (if it were using the same reference)
-      cloneDeep(this.fixture)
+      cloneDeep(this.fixture),
+      this.headers
     );
   }
 }
@@ -128,9 +130,10 @@ export class ManualEndpoint<IN, OUT> extends AbstractEndpoint<IN, OUT> {
     url: string | RegExp,
     originalUrlForSmokeJS: string,
     statusCode: number,
-    fixture: OUT
+    fixture: OUT,
+    headers: Headers = {}
   ) {
-    super(parentName);
+    super(parentName, headers);
     this.method = method;
     this.url = url;
     this.originalUrlForSmokeJS = originalUrlForSmokeJS;
@@ -148,7 +151,8 @@ export class ManualEndpoint<IN, OUT> extends AbstractEndpoint<IN, OUT> {
       // Make sure each call to RouteConfig is "pure"
       // in the sense each call to defaultConfig always return the original fixture,
       // not one that has been modified by a previous call (if it were using the same reference)
-      cloneDeep(this.fixture)
+      cloneDeep(this.fixture),
+      this.headers
     );
   }
 }

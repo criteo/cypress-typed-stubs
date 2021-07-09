@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AbstractEndpoint, Endpoint } from './endpoint';
-import { RouteConfig } from './routing';
+import { Headers, RouteConfig } from './routing';
 import { SpyHttpClient } from './spy-http-client';
 
 /**
@@ -36,14 +36,15 @@ export abstract class ClientStub<C> extends AbstractClientStub {
 
   protected constructor(clientConstructor: new (http: HttpClient, baseUrl?: string) => C) {
     super(clientConstructor.name);
-    this.client = new clientConstructor((this.spyHttpClient as unknown) as HttpClient);
+    this.client = new clientConstructor(this.spyHttpClient as unknown as HttpClient);
   }
 
   protected createEndpoint<IN, OUT>(
     actualEndpoint: (...otherParams: IN[]) => Observable<OUT>,
     status: number,
-    fixture: OUT
+    fixture: OUT,
+    headers: Headers = {}
   ): Endpoint<C, IN, OUT> {
-    return new Endpoint(this.spyHttpClient, this.client, actualEndpoint, this.name, status, fixture);
+    return new Endpoint(this.spyHttpClient, this.client, actualEndpoint, this.name, status, fixture, headers);
   }
 }

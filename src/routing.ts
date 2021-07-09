@@ -158,7 +158,7 @@ export class RouteConfig<OUT> {
    * @param headers
    */
   withHeaders(headers: Headers): this {
-    this.headers = {...headers};
+    this.headers = { ...headers };
 
     return this;
   }
