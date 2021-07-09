@@ -1,6 +1,8 @@
 {
   "name": "cypress-typed-stubs",
   "version": "1.0.0",
+  "main": "dist/out-tsc/index.js",
+  "types": "dist/out-tsc/index.d.ts",
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
