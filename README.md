@@ -121,14 +121,13 @@ const getById = stub.endpoints.getById;
 // Stub default config
 EndpointHelper.stub(getById.defaultConfig());
 ```
+Note that the usage of `EndpointHelper` is optional,
+you can use `cy.intercept` directly
 
 The endpoint is now stubbed by Cypress with a name automatically generated
 (prefixed with client name for consistency):
 
 ![routes](routes.png)
-
-Note that the usage of `EndpointHelper` is optional,
-you can use `cy.intercept` directly
 
 #### Adjust
 
