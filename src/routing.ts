@@ -1,3 +1,5 @@
+import { cloneDeep } from "lodash";
+
 /**
  * Copied from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/methods/index.d.ts
  * Keeping only the lowercase versions
@@ -75,14 +77,14 @@ export class RouteConfig<OUT> {
     // Used to keep track for smokejs fixtures
     public _originalUrlForSmokeJS: string,
     private status: number,
-    private fixture: OUT,
+    private _fixture: OUT,
     private headers: Headers = {}
   ) {}
 
   get route(): StubbedRoute<OUT> {
     // Important to return something if fixture is null, otherwise will be seen as not-stubbed!
     const emptyResponse = {};
-    const fixture = this.fixture !== null ? this.fixture : (emptyResponse as OUT);
+    const fixture = this._fixture !== null ? this._fixture : (emptyResponse as OUT);
 
     return {
       url: this.url,
@@ -134,6 +136,13 @@ export class RouteConfig<OUT> {
   }
 
   /**
+   * Return a copy of the fixture
+   */
+  get fixture(): OUT {
+    return cloneDeep(this._fixture);
+  }
+
+  /**
    * Override the HTTP status code returned by the endpoint
    * @param code
    */
@@ -148,7 +157,7 @@ export class RouteConfig<OUT> {
    * @param override
    */
   withOverride(override: Partial<OUT>): this {
-    this.fixture = RouteConfig.mergeFixtures(this.fixture, override);
+    this._fixture = RouteConfig.mergeFixtures(this._fixture, override);
 
     return this;
   }
@@ -168,7 +177,7 @@ export class RouteConfig<OUT> {
    * @param mapper the mapping function
    */
   mappingFixture(mapper: (fixture: OUT) => OUT): this {
-    this.fixture = mapper(this.fixture);
+    this._fixture = mapper(this._fixture);
 
     return this;
   }
