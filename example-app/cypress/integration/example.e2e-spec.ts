@@ -4,18 +4,24 @@ import {EndpointHelper} from "../../../src";
 describe('Main Page (without the library)', () => {
   it('should display ad set', () => {
     // Prepare
-    cy.intercept("GET", /.*\/campaign-api\/ad-sets\/.*/, {
-      adSet: {
-        id: 5,
-        partnerId: 5855,
-        unrelatedProperty: "abcd",
-        name: 'This is my ad set',
-        startDate: new Date('2020-10-20T22:08:46.683'),
-        conflictDetectionToken: 1607941414927,
-        // missing status property
-        audienceType: "invalid type" // No check on enum value
-      }
-    }).as("getAdSet");
+    cy.intercept(
+      "GET", // Need to know the HTTP method
+      /.*\/campaign-api\/ad-sets\/.*/, // Need to "guess" the appropriate URL regex
+      {
+        // Need to maintain a JSON object that matches the proper interface
+        adSet: {
+          id: 5,
+          partnerId: 5855,
+          unrelatedProperty: "abcd",
+          name: 'This is my ad set',
+          startDate: new Date('2020-10-20T22:08:46.683'),
+          conflictDetectionToken: 1607941414927,
+          // /!\ missing "status" property
+          audienceType: "invalid type" // No check on enum value
+        }
+      })
+      .as("getAdSet"); // Need to define a name that makes sense and that is reused throughout the tests
+
 
     // Act
     cy.visit("http://localhost:4200");
@@ -42,12 +48,16 @@ describe('Main Page (without the library)', () => {
 });
 
 describe('Main Page (with the library)', () => {
+  // Create the stub _and initialize it_
   const stub = new AdSetsStub().init();
-  const getById = stub.endpoints.getById.defaultConfig();
+
+  // Endpoints
+  const getById = stub.endpoints.getById;
 
   it('should display ad set', () => {
     // Prepare
-    EndpointHelper.stub(getById);
+    // Get the default config. Could be with override of status, fixture, etc
+    EndpointHelper.stub(getById.defaultConfig());
 
     // Act
     cy.visit("http://localhost:4200");
@@ -63,7 +73,7 @@ describe('Main Page (with the library)', () => {
 
   it('should handled ad set not found', () => {
     // Prepare
-    EndpointHelper.stub(getById.withStatusCode(404).withOverride({
+    EndpointHelper.stub(getById.defaultConfig().withStatusCode(404).withOverride({
       errors: ["ad set id 12 was not found"] // This is type checked
     }));
 

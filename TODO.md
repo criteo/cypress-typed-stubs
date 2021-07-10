@@ -1,0 +1,5 @@
+- properly defined npm dependencies
+- semantic versioning: read https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-format
+- use https://github.com/semantic-release/semantic-release
+- add unit tests
+- implement automatic generation of [Smoke](https://github.com/sinedied/smoke) json files
