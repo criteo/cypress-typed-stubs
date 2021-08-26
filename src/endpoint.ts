@@ -8,6 +8,7 @@ import { SpyHttpClient } from './spy-http-client';
  * IN: endpoint input parameters
  * OUT: endpoint response
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export abstract class AbstractEndpoint<IN, OUT> {
   abstract defaultConfig(...params: unknown[]): RouteConfig<OUT>;
 

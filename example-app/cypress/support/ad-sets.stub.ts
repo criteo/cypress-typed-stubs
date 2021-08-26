@@ -1,5 +1,5 @@
-import {ClientStub} from "../../../src";
-import {AdSetsClient, AdSetStatus, AudienceType} from "../../src/client-generated-by-nswag";
+import { ClientStub } from '../../../src';
+import { AdSetsClient, AdSetStatus, AudienceType } from '../../src/client-generated-by-nswag';
 
 export class AdSetsStub extends ClientStub<AdSetsClient> {
   constructor() {
@@ -20,9 +20,9 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
           startDate: new Date('2020-10-20T22:08:46.683'),
           conflictDetectionToken: 1607941414927,
           status: AdSetStatus.Draft,
-          audienceType: AudienceType.Custom
-        }
+          audienceType: AudienceType.Custom,
+        },
       }
-    )
+    ),
   };
 }
