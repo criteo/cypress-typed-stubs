@@ -1,7 +1,11 @@
 {
   "name": "cypress-typed-stubs",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "homepage": "https://github.com/criteo/cypress-typed-stubs",
+  "description": "Typed Cypress stubs with automatic URL patterns, based on clients generated with Swagger",
+  "keywords": ["cypress", "typescript", "typing", "angular", "swagger"],
   "main": "dist/out-tsc/index.js",
+  "license": "Apache-2.0",
   "types": "dist/out-tsc/index.d.ts",
   "scripts": {
     "build": "tsc",

@@ -1,11 +1,11 @@
 # Cypress typed stubs
 
+A Criteo npm package to define **typed** Cypress stubs with **automatic** URL patterns,
+based on clients generated with Swagger.
+
 [![License](https://img.shields.io/badge/license-apache-blue.svg)](LICENSE)
 
-> An npm package to define **typed** Cypress stubs with **automatic** URL patterns,
-> based on clients generated with Swagger.
-
-`cypress-typed-stubs` introspects your typescript (Angular) clients generated
+`criteo/cypress-typed-stubs` introspects your typescript (Angular) clients generated
 by [nswag](https://elanderson.net/2019/12/using-nswag-to-generate-angular-client-for-an-asp-net-core-3-api/)
 and helps you define your own [Cypress](https://www.cypress.io/) stubs very easily, where:
 
