@@ -23,7 +23,10 @@ export class EndpointHelper {
       const response: GenericStaticResponse<string, OUT> = {
         body,
         statusCode: route.status,
-        headers: route.headers,
+        headers: {
+          ...route.headers,
+          'content-type': 'application/json',
+        },
       };
       if (route.onResponse) {
         req.on('response', (res) => route.onResponse?.(res.body));
