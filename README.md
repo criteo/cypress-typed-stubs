@@ -187,6 +187,8 @@ cy.wait(getById.alias);
 
 ## Contributions
 
+Please use Node v15 and npm v7.
+
 ### Testing within a "host" project
 
 From this project:
