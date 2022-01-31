@@ -19,8 +19,10 @@ And the fixture used to stub your API is **type checked**.
 
 ## Installation
 
+Use cypress-typed-stubs v2.x.x for Cypress v9+ and v1.x.x for older versions.
+
 ```shell
-npm install cypress-typed-stubs
+npm install --save-dev cypress-typed-stubs
 ```
 
 ## Usage

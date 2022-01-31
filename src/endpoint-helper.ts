@@ -14,14 +14,8 @@ export class EndpointHelper {
   static stub<OUT>(routeConfig: RouteConfig<OUT>): void {
     const { route } = routeConfig;
     const interceptor: HttpRequestInterceptor = (req) => {
-      // For some reason Cypress doesn't handle scalar types correctly.
-      // They have to be turned into strings otherwise it will fail with an exception and stop the test immediately
-      const body = (
-        typeof route.response == 'object' ? route.response : (('"' + route.response + '"') as unknown)
-      ) as OUT;
-
       const response: GenericStaticResponse<string, OUT> = {
-        body,
+        body: route.response,
         statusCode: route.status,
         headers: {
           ...route.headers,
