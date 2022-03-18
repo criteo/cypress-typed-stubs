@@ -1,6 +1,6 @@
 {
   "name": "cypress-typed-stubs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "homepage": "https://github.com/criteo/cypress-typed-stubs",
   "description": "Typed Cypress stubs with automatic URL patterns, based on clients generated with Swagger",
   "keywords": [
@@ -28,9 +28,9 @@
     "style:fix": "npm run lint:fix && npm run prettier:fix"
   },
   "dependencies": {
-    "lodash": "4.17.21",
-    "rxjs": "6.6.3",
-    "tslib": "2.0.3"
+    "lodash": "^4.17.21",
+    "rxjs": "^6.6.3",
+    "tslib": "^2.0.3"
   },
   "peerDependencies": {
     "@angular/common": ">= 11",
