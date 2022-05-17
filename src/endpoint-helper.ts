@@ -1,5 +1,6 @@
 import { GenericStaticResponse, HttpRequestInterceptor } from 'cypress/types/net-stubbing';
 import { AbstractEndpoint } from './endpoint';
+import { AddRequestedUrl } from './request-manager';
 import { RouteConfig } from './routing';
 import Chainable = Cypress.Chainable;
 
@@ -14,6 +15,7 @@ export class EndpointHelper {
   static stub<OUT>(routeConfig: RouteConfig<OUT>): void {
     const { route } = routeConfig;
     const interceptor: HttpRequestInterceptor = (req) => {
+      AddRequestedUrl(routeConfig.name);
       const response: GenericStaticResponse<string, OUT> = {
         body: route.response,
         statusCode: route.status,
