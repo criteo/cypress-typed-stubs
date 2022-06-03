@@ -5,4 +5,3 @@ Cypress.Commands.overwrite<'wait', 'optional'>('wait', (originalFn, alias, optio
   AddAwaitedRequest(optionList);
   return originalFn(alias, options);
 });
-%

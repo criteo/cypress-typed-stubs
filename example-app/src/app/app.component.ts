@@ -1,7 +1,7 @@
-import {Component, Injectable} from '@angular/core';
-import {Observable, of, throwError} from 'rxjs';
-import {catchError, filter, map} from 'rxjs/operators';
-import {AdSetDetails, AdSetsClient, SwaggerException} from '../client-generated-by-nswag';
+import { Component, Injectable } from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, filter, map } from 'rxjs/operators';
+import { AdSetDetails, AdSetsClient, SwaggerException } from '../client-generated-by-nswag';
 
 function isDefined<T>(arg: T | null | undefined): arg is T {
   return arg !== null && arg !== undefined;
