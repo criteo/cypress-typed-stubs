@@ -3,3 +3,5 @@ export * from './endpoint';
 export * from './endpoint-helper';
 export * from './routing';
 export * from './spy-http-client';
+export * from './commands';
+export * from './mocha-override';
