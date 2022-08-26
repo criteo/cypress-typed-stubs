@@ -66,8 +66,8 @@ describe('Main Page (with the library)', () => {
     // Assert
     cy.get('h1').contains('This is my ad set');
     // You might prefer to refer to the fixture directly
-    cy.get('h1').contains(getById.fixture?.adSet?.name);
-    cy.get('h2').contains(getById.fixture?.adSet?.description);
+    if (getById.fixture?.adSet?.name) cy.get('h1').contains(getById.fixture?.adSet?.name);
+    if (getById.fixture?.adSet?.description) cy.get('h2').contains(getById.fixture?.adSet?.description);
   });
 
   it('should handled ad set not found', () => {

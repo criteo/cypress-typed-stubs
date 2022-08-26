@@ -31,7 +31,7 @@ export class AdSetsClient extends GeneratedClient {
         this.baseUrl = baseUrl ? baseUrl : "";
     }
 
-  getById(adSetId: number): Observable<GetAdSetDetailsResponse | null> {
+  getById(adSetId: number, adSetName: string): Observable<GetAdSetDetailsResponse | null> {
     let url_ = this.baseUrl + "/campaign-api/ad-sets/{adSetId}";
     if (adSetId === undefined || adSetId === null)
       throw new Error("The parameter 'adSetId' must be defined.");

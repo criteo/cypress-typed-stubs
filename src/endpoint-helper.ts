@@ -61,7 +61,10 @@ export class EndpointHelper {
    * @param endpoint
    * @param expectedRequest
    */
-  static waitForCallAndCheck<IN>(endpoint: AbstractEndpoint<IN, unknown>, expectedRequest: Partial<IN>): Chainable {
+  static waitForCallAndCheck<IN extends unknown[]>(
+    endpoint: AbstractEndpoint<IN, unknown>,
+    expectedRequest: Partial<IN>
+  ): Chainable {
     return cy
       .wait(endpoint.alias)
       .its('request.body')
@@ -80,7 +83,7 @@ export class EndpointHelper {
    * @param endpoint
    * @param assertion
    */
-  static waitForCallAndAssert<IN>(
+  static waitForCallAndAssert<IN extends unknown[]>(
     endpoint: AbstractEndpoint<IN, unknown>,
     assertion: (requestBody: IN) => boolean
   ): Chainable {

@@ -10,7 +10,9 @@ import { SpyHttpClient } from './spy-http-client';
  */
 export abstract class AbstractClientStub {
   // AbstractEndpoint<never, unknown> needed for endpoints without parameter
-  abstract endpoints: { [endpointName: string]: AbstractEndpoint<unknown, unknown> | AbstractEndpoint<never, unknown> };
+  abstract endpoints: {
+    [endpointName: string]: AbstractEndpoint<unknown[], unknown> | AbstractEndpoint<never, unknown>;
+  };
 
   protected constructor(public name: string) {}
 
@@ -39,8 +41,8 @@ export abstract class ClientStub<C> extends AbstractClientStub {
     this.client = new clientConstructor(this.spyHttpClient as unknown as HttpClient);
   }
 
-  protected createEndpoint<IN, OUT>(
-    actualEndpoint: (...otherParams: IN[]) => Observable<OUT>,
+  protected createEndpoint<IN extends unknown[], OUT>(
+    actualEndpoint: (...otherParams: IN) => Observable<OUT>,
     status: number,
     fixture: OUT,
     headers: Headers = {}

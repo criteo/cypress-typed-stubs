@@ -8,9 +8,8 @@ import { SpyHttpClient } from './spy-http-client';
  * IN: endpoint input parameters
  * OUT: endpoint response
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export abstract class AbstractEndpoint<IN, OUT> {
-  abstract defaultConfig(...params: unknown[]): RouteConfig<OUT>;
+export abstract class AbstractEndpoint<IN extends unknown[], OUT> {
+  abstract defaultConfig(...params: IN): RouteConfig<OUT>;
 
   endpointName!: string;
 
@@ -28,7 +27,7 @@ export abstract class AbstractEndpoint<IN, OUT> {
 /**
  * Endpoint based on a generated client endpoint
  */
-export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
+export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN, OUT> {
   private static readonly STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
   private static readonly ARGUMENT_NAMES = /([^\s,]+)/g;
 
@@ -50,7 +49,7 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
    * @param func
    * @private
    */
-  private getParamNames(func: (...t: IN[]) => unknown) {
+  private getParamNames(func: (...t: IN) => unknown) {
     const fnStr = func.toString().replace(Endpoint.STRIP_COMMENTS, '');
     let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(Endpoint.ARGUMENT_NAMES);
     if (result === null) {
@@ -62,7 +61,7 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
   constructor(
     private readonly spyHttpClient: SpyHttpClient,
     private readonly actualClient: C,
-    private readonly actualEndpoint: (...params: IN[]) => Observable<OUT>,
+    private readonly actualEndpoint: (...params: IN) => Observable<OUT>,
     parentName: string,
     public statusCode: number,
     public fixture: OUT,
@@ -71,7 +70,7 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
     super(parentName, headers);
   }
 
-  defaultConfig(...userParams: IN[]): RouteConfig<OUT> {
+  defaultConfig(...userParams: IN | []): RouteConfig<OUT> {
     // Inject url modifier if needed
     this.spyHttpClient.urlModifier = this.urlModifier;
 
@@ -83,14 +82,16 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
         return userParams[index];
       }
 
-      return SpyHttpClient.addPlaceholder(paramName) as unknown as IN;
-    });
+      return SpyHttpClient.addPlaceholder(paramName);
+    }) as IN;
 
     try {
-      this.actualEndpoint.call(this.actualClient, ...Object.values(params));
+      this.actualEndpoint.call(this.actualClient, ...params);
     } catch (e) {
       // This happens in particular on CampaignBidStrategyClient.getRecommendations that expects an array of ids
       // For the moment the easy fix is to not try to provide params...
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore: Not providing any params to the endpoint
       this.actualEndpoint.call(this.actualClient);
     }
 
@@ -114,7 +115,7 @@ export class Endpoint<C, IN, OUT> extends AbstractEndpoint<IN, OUT> {
 /**
  * Endpoint configured manually, not based on a generated client
  */
-export class ManualEndpoint<IN, OUT> extends AbstractEndpoint<IN, OUT> {
+export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<IN, OUT> {
   method: Method;
 
   url: string | RegExp;

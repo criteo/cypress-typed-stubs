@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:check-typing": "tsc --noEmit --project tsconfig.spec.json && tsc --noEmit --project ./cypress",
     "watch": "ng build --watch --configuration development",
     "cypress:open": "cypress open"
   },
