@@ -15,7 +15,7 @@ function isDefined<T>(arg: T | null | undefined): arg is T {
 @Injectable()
 export class AppComponent {
   constructor(private readonly adSetClient: AdSetsClient) {
-    this.adSet$ = this.adSetClient.getById(12).pipe(
+    this.adSet$ = this.adSetClient.getById(12, 'Ad set name').pipe(
       map((response) => response?.adSet),
       filter(isDefined),
       // Of course this is not how you should handle errors
