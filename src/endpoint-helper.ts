@@ -61,14 +61,14 @@ export class EndpointHelper {
    * @param endpoint
    * @param expectedRequest
    */
-  static waitForCallAndCheck<IN extends unknown[]>(
-    endpoint: AbstractEndpoint<IN, unknown>,
-    expectedRequest: Partial<IN>
+  static waitForCallAndCheck<RequestBody>(
+    endpoint: AbstractEndpoint<unknown[], unknown>,
+    expectedRequest: Partial<RequestBody>
   ): Chainable {
     return cy
       .wait(endpoint.alias)
       .its('request.body')
-      .then((reqBody: IN) => {
+      .then((reqBody: RequestBody) => {
         for (const key in expectedRequest) {
           // eslint-disable-next-line no-prototype-builtins
           if (expectedRequest.hasOwnProperty(key)) {
@@ -83,14 +83,14 @@ export class EndpointHelper {
    * @param endpoint
    * @param assertion
    */
-  static waitForCallAndAssert<IN extends unknown[]>(
-    endpoint: AbstractEndpoint<IN, unknown>,
-    assertion: (requestBody: IN) => boolean
+  static waitForCallAndAssert<RequestBody>(
+    endpoint: AbstractEndpoint<unknown[], unknown>,
+    assertion: (requestBody: RequestBody) => boolean
   ): Chainable {
     return cy
       .wait(endpoint.alias)
       .its('request.body')
-      .then((reqBody: IN) => {
+      .then((reqBody: RequestBody) => {
         assert.isTrue(assertion(reqBody));
       });
   }
