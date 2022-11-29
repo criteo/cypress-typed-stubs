@@ -4,7 +4,7 @@
   "parserOptions": {
     "ecmaVersion": 2020
   },
-  "plugins": ["simple-import-sort", "eslint-plugin-padding"],
+  "plugins": ["simple-import-sort", "eslint-plugin-padding-ex"],
   "overrides": [
     {
       "files": ["*.ts"],
@@ -18,8 +18,7 @@
         "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/prefer-readonly": "error",
         "@typescript-eslint/naming-convention": ["error", { "selector": "interface", "format": ["PascalCase"] }],
-        "no-restricted-imports": ["error", { "patterns": [".."] }],
-        "padding/spacing": [
+        "padding-ex/spacing": [
           "error",
           { "blankLine": "always", "prev": "export class", "next": "*" },
           { "blankLine": "always", "prev": "export interface", "next": "*" },

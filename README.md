@@ -19,7 +19,13 @@ And the fixture used to stub your API is **type checked**.
 
 ## Installation
 
-Use cypress-typed-stubs v2.x.x for Cypress v9+ and v1.x.x for older versions.
+Compatibility table:
+
+| Angular version | Cypress version | cypress-typed-stubs version |
+| --------------- | --------------- | --------------------------- |
+| 11              | <9              | 2                           |
+| 11              | 9               | 3.0.0-beta.4                |
+| 13              | 9               | 4.0.0-beta.0                |
 
 ```shell
 npm install --save-dev cypress-typed-stubs
@@ -36,7 +42,7 @@ or `null`.
 ```typescript
 export class AdSetsClient extends GeneratedClient {
   getById(adSetId: number): Observable<GetAdSetDetailsResponse | null> {
-    let url_ = this.baseUrl + "/campaign-api/ad-sets/{adSetId}";
+    let url_ = this.baseUrl + '/campaign-api/ad-sets/{adSetId}';
     // ...
   }
 }
@@ -48,7 +54,7 @@ If you want to stub this endpoint in your Cypress tests, you might want to do so
 
 ```typescript
 cy.intercept(
-  "GET", // Need to know the HTTP method
+  'GET', // Need to know the HTTP method
   /.*\/campaign-api\/ad-sets\/.*/, // Need to "guess" the appropriate URL regex
   {
     // Need to maintain a JSON object that matches the proper interface
@@ -56,10 +62,10 @@ cy.intercept(
       id: 5,
       // ...
       // No type checking!
-      audienceType: "invalid type"
-    }
-  })
-  .as("getAdSet"); // Need to define a name that makes sense and that is reused throughout the tests
+      audienceType: 'invalid type',
+    },
+  }
+).as('getAdSet'); // Need to define a name that makes sense and that is reused throughout the tests
 
 // Can't easily reuse stubs
 ```
@@ -67,10 +73,11 @@ cy.intercept(
 and wait on the call with:
 
 ```typescript
-cy.wait("@getAdSet");
+cy.wait('@getAdSet');
 ```
 
 #### 👎 Issues
+
 - the HTTP method and URL pattern have to be "guessed" and maintained if they happen to change in the generated client
 - the provided fixture is **not type checked**
 - a name has to be chosen and duplicated in the tests (prepended with `@`). No naming convention
@@ -80,6 +87,7 @@ cy.wait("@getAdSet");
 #### Create stubs
 
 Define
+
 - a **stub** that matches the generated client
   (ex: [`AdSetsStub`](./example-app/cypress/support/ad-sets.stub.ts))
 - stub **endpoints** that match the generated client endpoint
@@ -101,10 +109,10 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
         adSet: {
           id: 5,
           // ... other properties
-          audienceType: AudienceType.Custom
-        }
+          audienceType: AudienceType.Custom,
+        },
       }
-    )
+    ),
   };
 }
 ```
@@ -123,6 +131,7 @@ const getById = stub.endpoints.getById;
 // Stub default config
 EndpointHelper.stub(getById.defaultConfig());
 ```
+
 Note that the usage of `EndpointHelper` is optional,
 you can use `cy.intercept` directly
 
@@ -134,48 +143,61 @@ The endpoint is now stubbed by Cypress with a name automatically generated
 #### Adjust
 
 The stub can be adapted based on the default configuration:
+
 - change HTTP status
+
 ```typescript
 EndpointHelper.stub(getById.defaultConfig().withStatusCode(500));
 ```
+
 - adapt the fixture. Mapping is type checked
+
 ```typescript
-EndpointHelper.stub(getById.defaultConfig().mappingFixture(fixture => ({
-  adSet: {
-    ...fixture.adSet,
-    id: 7 // Simply change the id
-  }
-})));
-```
-- replace the fixture entirely. Overwrite is type checked
-```typescript
-EndpointHelper.stub(getById.defaultConfig().withOverride({
-  // Everything is typed!
-  adSet: {
-    id: 6,
-    // ... other properties
-    audienceType: AudienceType.Commerce
-  }
-}));
-```
-- set HTTP headers
-```typescript
-EndpointHelper.stub(getById.defaultConfig().withHeaders({
-  'myHeader': 'myValue'
-}));
-```
-- adaptations can be combined with fluent syntax
-```typescript
-EndpointHelper.stub(getById.defaultConfig()
-  .withStatusCode(500)
-  .withOverride({})
-  .withHeaders({'traceId': '12345'})
+EndpointHelper.stub(
+  getById.defaultConfig().mappingFixture((fixture) => ({
+    adSet: {
+      ...fixture.adSet,
+      id: 7, // Simply change the id
+    },
+  }))
 );
+```
+
+- replace the fixture entirely. Overwrite is type checked
+
+```typescript
+EndpointHelper.stub(
+  getById.defaultConfig().withOverride({
+    // Everything is typed!
+    adSet: {
+      id: 6,
+      // ... other properties
+      audienceType: AudienceType.Commerce,
+    },
+  })
+);
+```
+
+- set HTTP headers
+
+```typescript
+EndpointHelper.stub(
+  getById.defaultConfig().withHeaders({
+    myHeader: 'myValue',
+  })
+);
+```
+
+- adaptations can be combined with fluent syntax
+
+```typescript
+EndpointHelper.stub(getById.defaultConfig().withStatusCode(500).withOverride({}).withHeaders({ traceId: '12345' }));
 ```
 
 #### Wait
 
 Endpoints have a default alias that can be used to wait calls:
+
 ```typescript
 cy.wait(getById.alias);
 ```
@@ -189,7 +211,7 @@ cy.wait(getById.alias);
 
 ## Contributions
 
-Please use Node v15 and npm v7.
+Please use Node v16 and npm v8.
 
 ### Testing within a "host" project
 
@@ -207,9 +229,9 @@ project.
 
 From the project using the library:
 
-````shell
+```shell
 npm link cypress-typed-stubs
-````
+```
 
 After you are done with your tests, make sure to **not** commit your changes to `package.json` (the removal of dev
 dependencies)
