@@ -1,6 +1,6 @@
 {
   "name": "cypress-typed-stubs",
-  "version": "4.0.0-beta.0",
+  "version": "4.0.0-beta.1",
   "homepage": "https://github.com/criteo/cypress-typed-stubs",
   "description": "Typed Cypress stubs with automatic URL patterns, based on clients generated with Swagger",
   "keywords": [
@@ -29,13 +29,13 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "rxjs": "^6.6.7",
     "tslib": "^2.3.1"
   },
   "peerDependencies": {
     "@angular/common": ">= 13",
     "@angular/core": ">= 13",
-    "cypress": ">= 9"
+    "cypress": ">= 9",
+    "rxjs": "^6.6.7 || ^7.4.0"
   },
   "devDependencies": {
     "@angular/common": "13.3.12",
