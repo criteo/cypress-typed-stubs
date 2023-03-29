@@ -25,7 +25,7 @@ Compatibility table:
 | --------------- | --------------- | --------------------------- |
 | 11              | <9              | 2                           |
 | 11              | 9               | 3.0.0-beta.4                |
-| 13              | 9               | 4.0.0-beta.0                |
+| 13              | 9               | 4.0.0-beta.2                |
 
 ```shell
 npm install --save-dev cypress-typed-stubs
