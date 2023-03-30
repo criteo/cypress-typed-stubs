@@ -1,4 +1,5 @@
 import { HttpClient, HttpEvent, HttpHandler, HttpResponse } from '@angular/common/http';
+import { isString } from 'lodash';
 import { Observable, of } from 'rxjs';
 import { Method, Route, RouteWithOriginalUrl } from './routing';
 
@@ -38,20 +39,27 @@ export class SpyHttpClient extends HttpClient {
     const originalUrl = url;
 
     // Potential adaptation of the URL
-    const modifiedUrl = this.urlModifier(url);
+    let modifiedUrl = this.urlModifier(url);
 
     const newRoute: Route = { url: modifiedUrl, method };
 
-    if (!(modifiedUrl instanceof RegExp)) {
-      let urlForRegexp = modifiedUrl.replace('?', '\\?');
-
+    if (isString(modifiedUrl)) {
       let foundMatch = false;
+
+      // Ignore the URL params in the matching pattern ("/foo?bar=baz" and "/foo?qux=baz" is actually the same endpoint)
+      const paramsIndex = modifiedUrl.indexOf('?');
+      if (paramsIndex !== -1) {
+        modifiedUrl = `${modifiedUrl.substring(0, paramsIndex)}(.*)`;
+        foundMatch = true;
+      }
+
+      let urlForRegexp = modifiedUrl;
 
       // If any placeholder has been injected, that means a parameter value from the client endpoint
       // has been replaced in the URL. In other words, we need a regexp and we need to replace the placeholders
       // back with their original "parameter name" (ex: XXXADVERTISERIDXXX => advertiserId)
       Object.keys(SpyHttpClient.placeholders).forEach((capture) => {
-        if (new RegExp(`${capture}`).test(modifiedUrl)) {
+        if (new RegExp(`${capture}`).test(modifiedUrl as string)) {
           foundMatch = true;
 
           // Named groups ar not working on some browsers, see https://stackoverflow.com/questions/5367369/named-capturing-groups-in-javascript-regex
