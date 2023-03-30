@@ -1,6 +1,6 @@
 {
   "name": "cypress-typed-stubs",
-  "version": "4.0.0-beta.3",
+  "version": "4.0.0-beta.4",
   "homepage": "https://github.com/criteo/cypress-typed-stubs",
   "description": "Typed Cypress stubs with automatic URL patterns, based on clients generated with Swagger",
   "keywords": [
