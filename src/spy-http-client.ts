@@ -49,7 +49,8 @@ export class SpyHttpClient extends HttpClient {
       // Ignore the URL params in the matching pattern ("/foo?bar=baz" and "/foo?qux=baz" is actually the same endpoint)
       const paramsIndex = modifiedUrl.indexOf('?');
       if (paramsIndex !== -1) {
-        modifiedUrl = `${modifiedUrl.substring(0, paramsIndex)}(.*)`;
+        const urlWithoutParams = modifiedUrl.substring(0, paramsIndex);
+        modifiedUrl = `${urlWithoutParams}$|^${urlWithoutParams}\\?(.*)`;
         foundMatch = true;
       }
 
@@ -59,13 +60,13 @@ export class SpyHttpClient extends HttpClient {
       // has been replaced in the URL. In other words, we need a regexp and we need to replace the placeholders
       // back with their original "parameter name" (ex: XXXADVERTISERIDXXX => advertiserId)
       Object.keys(SpyHttpClient.placeholders).forEach((capture) => {
-        if (new RegExp(`${capture}`).test(modifiedUrl as string)) {
+        if (new RegExp(capture).test(modifiedUrl as string)) {
           foundMatch = true;
 
           // Named groups ar not working on some browsers, see https://stackoverflow.com/questions/5367369/named-capturing-groups-in-javascript-regex
           // urlForRegexp = urlForRegexp.replace(capture, `(?<${HttpClientSpy.placeholders[capture]}>[^?#/]+)`);
 
-          urlForRegexp = urlForRegexp.replace(capture, '([^?#/]+)');
+          urlForRegexp = urlForRegexp.replace(new RegExp(capture, 'g'), '([^?#/]+)');
         }
       });
 
