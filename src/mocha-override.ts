@@ -1,9 +1,10 @@
 import { CheckEmptiedStubRequests, ResetStubbedRequests } from './request-manager';
 
-before(ResetStubbedRequests);
+const checkAwaitedRequests = Cypress.config('checkAwaitedRequests' as unknown as Cypress.Config);
 
-beforeEach(ResetStubbedRequests);
-
-after(CheckEmptiedStubRequests);
-
-afterEach(CheckEmptiedStubRequests);
+if (checkAwaitedRequests == null || checkAwaitedRequests === true) {
+  before(ResetStubbedRequests);
+  beforeEach(ResetStubbedRequests);
+  after(CheckEmptiedStubRequests);
+  afterEach(CheckEmptiedStubRequests);
+}
