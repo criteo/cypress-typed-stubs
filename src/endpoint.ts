@@ -70,7 +70,7 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
     super(parentName, headers);
   }
 
-  defaultConfig(...userParams: IN | []): RouteConfig<OUT> {
+  defaultConfig(...userParams: Partial<IN> | []): RouteConfig<OUT> {
     // Inject url modifier if needed
     this.spyHttpClient.urlModifier = this.urlModifier;
 
