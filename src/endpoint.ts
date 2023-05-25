@@ -78,11 +78,19 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
 
     // Use provided params in priority
     const params = expectedParams.map((paramName, index: number) => {
+      let paramPlaceholder: string;
       if (userParams[index]) {
-        return userParams[index];
+        paramPlaceholder = userParams[index] as string;
+      } else {
+        paramPlaceholder = SpyHttpClient.addPlaceholder(paramName);
       }
 
-      return SpyHttpClient.addPlaceholder(paramName);
+      // If any expected param is an array convert the placeholder to an array
+      const isParamArray = new RegExp(`${paramName}\\.forEach`);
+      if (this.actualEndpoint.toString().match(isParamArray)) {
+        return [paramPlaceholder];
+      }
+      return paramPlaceholder;
     }) as IN;
 
     try {
