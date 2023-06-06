@@ -96,11 +96,10 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
     try {
       this.actualEndpoint.call(this.actualClient, ...params);
     } catch (e) {
-      // This happens in particular on CampaignBidStrategyClient.getRecommendations that expects an array of ids
-      // For the moment the easy fix is to not try to provide params...
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: Not providing any params to the endpoint
-      this.actualEndpoint.call(this.actualClient);
+      console.error(
+        'Advanced parameter types are not supported (like File). Please use ManualEndpoint or provide proper userParams to defaultConfig',
+        e
+      );
     }
 
     const { url, method, _originalUrlForSmokeJS } = this.spyHttpClient.lastRequestedRoute;
