@@ -51,7 +51,9 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
    */
   private getParamNames(func: (...t: IN) => unknown) {
     const fnStr = func.toString().replace(Endpoint.STRIP_COMMENTS, '');
-    let result = fnStr.slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')')).match(Endpoint.ARGUMENT_NAMES);
+    let result: string[] | null = fnStr
+      .slice(fnStr.indexOf('(') + 1, fnStr.indexOf(')'))
+      .match(Endpoint.ARGUMENT_NAMES);
     if (result === null) {
       result = [];
     }
