@@ -1,3 +1,4 @@
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
 import { cloneDeep } from 'lodash';
 
 /**
@@ -64,6 +65,7 @@ export interface RouteWithOriginalUrl extends Route {
  */
 export interface StubbedRoute<OUT> extends Route {
   response: OUT;
+  responseBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT;
   status: number;
   onResponse?: (body: unknown) => void;
   headers?: Headers;
@@ -78,7 +80,8 @@ export class RouteConfig<OUT> {
     public _originalUrlForSmokeJS: string,
     private status: number,
     private _fixture: OUT,
-    private headers: Headers = {}
+    private headers: Headers = {},
+    private readonly _fixtureBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT
   ) {}
 
   get route(): StubbedRoute<OUT> {
@@ -92,6 +95,7 @@ export class RouteConfig<OUT> {
       status: this.status,
       headers: this.headers,
       response: fixture,
+      responseBuilder: this._fixtureBuilder,
       onResponse: (body: unknown) => {
         const logRequest = (parsedBody: unknown) => {
           // eslint-disable-next-line no-console
@@ -140,6 +144,13 @@ export class RouteConfig<OUT> {
    */
   get fixture(): OUT {
     return cloneDeep(this._fixture);
+  }
+
+  /**
+   * Return the fixture builder
+   */
+  get fixtureBuilder(): undefined | ((req: CyHttpMessages.IncomingHttpRequest) => OUT) {
+    return this._fixtureBuilder;
   }
 
   /**

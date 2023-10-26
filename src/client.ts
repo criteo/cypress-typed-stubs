@@ -1,4 +1,5 @@
 import { HttpClient } from '@angular/common/http';
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
 import { Observable } from 'rxjs';
 import { AbstractEndpoint, Endpoint } from './endpoint';
 import { Headers, RouteConfig } from './routing';
@@ -45,8 +46,18 @@ export abstract class ClientStub<C> extends AbstractClientStub {
     actualEndpoint: (...otherParams: IN) => Observable<OUT>,
     status: number,
     fixture: OUT,
-    headers: Headers = {}
+    headers: Headers = {},
+    fixtureBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT
   ): Endpoint<C, IN, OUT> {
-    return new Endpoint(this.spyHttpClient, this.client, actualEndpoint, this.name, status, fixture, headers);
+    return new Endpoint(
+      this.spyHttpClient,
+      this.client,
+      actualEndpoint,
+      this.name,
+      status,
+      fixture,
+      headers,
+      fixtureBuilder
+    );
   }
 }

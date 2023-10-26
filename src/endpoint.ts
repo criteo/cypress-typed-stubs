@@ -1,3 +1,4 @@
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
 import { Headers, Method, RouteConfig } from './routing';
@@ -67,7 +68,8 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
     parentName: string,
     public statusCode: number,
     public fixture: OUT,
-    headers: Headers = {}
+    headers: Headers = {},
+    public fixtureBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT
   ) {
     super(parentName, headers);
   }
@@ -117,7 +119,8 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
       // in the sense each call to defaultConfig always return the original fixture,
       // not one that has been modified by a previous call (if it were using the same reference)
       cloneDeep(this.fixture),
-      this.headers
+      this.headers,
+      this.fixtureBuilder
     );
   }
 }
@@ -136,6 +139,8 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
 
   fixture: OUT;
 
+  fixtureBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT;
+
   constructor(
     parentName: string,
     method: Method,
@@ -143,7 +148,8 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
     originalUrlForSmokeJS: string,
     statusCode: number,
     fixture: OUT,
-    headers: Headers = {}
+    headers: Headers = {},
+    fixtureBuilder?: (req: CyHttpMessages.IncomingHttpRequest) => OUT
   ) {
     super(parentName, headers);
     this.method = method;
@@ -151,6 +157,7 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
     this.originalUrlForSmokeJS = originalUrlForSmokeJS;
     this.statusCode = statusCode;
     this.fixture = fixture;
+    this.fixtureBuilder = fixtureBuilder;
   }
 
   defaultConfig(): RouteConfig<OUT> {
@@ -164,7 +171,8 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
       // in the sense each call to defaultConfig always return the original fixture,
       // not one that has been modified by a previous call (if it were using the same reference)
       cloneDeep(this.fixture),
-      this.headers
+      this.headers,
+      this.fixtureBuilder
     );
   }
 }
