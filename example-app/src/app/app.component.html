@@ -1,4 +1,9 @@
 <ng-container *ngIf="adSet$ | async as adSet">
   <h1>{{adSet.name}}</h1>
   <h2>{{adSet.description}}</h2>
+
+  <select [(ngModel)]="selectedLanguageCode" (change)="onLanguageSelected()">
+    <option *ngFor="let language of languages" [value]="language.code">{{ language.name }}</option>
+  </select>
+
 </ng-container>

@@ -7,6 +7,11 @@ function isDefined<T>(arg: T | null | undefined): arg is T {
   return arg !== null && arg !== undefined;
 }
 
+interface Language {
+  code: string;
+  name: string;
+}
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -14,8 +19,21 @@ function isDefined<T>(arg: T | null | undefined): arg is T {
 })
 @Injectable()
 export class AppComponent {
+  languages: Language[] = [
+    { code: 'en-US', name: 'English' },
+    { code: 'fr-FR', name: 'Français' },
+  ];
+
+  onLanguageSelected() {
+    this.adSet$ = this.fetchAdSet();
+  }
+
   constructor(private readonly adSetClient: AdSetsClient) {
-    this.adSet$ = this.adSetClient.getById(12, 'Ad set name').pipe(
+    this.adSet$ = this.fetchAdSet();
+  }
+
+  private fetchAdSet(): Observable<AdSetDetails> {
+    return this.adSetClient.getById(12, this.selectedLanguageCode).pipe(
       map((response) => response?.adSet),
       filter(isDefined),
       // Of course this is not how you should handle errors
@@ -26,4 +44,5 @@ export class AppComponent {
   }
 
   adSet$: Observable<AdSetDetails>;
+  selectedLanguageCode: string = this.languages[0].code;
 }
