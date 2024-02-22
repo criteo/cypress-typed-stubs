@@ -118,6 +118,43 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
 }
 ```
 
+Instead of a fixture, you can provide a fixture builder: it is a function that takes a cypress request object ([CyHttpMessages.IncomingHttpRequest](https://github.com/cypress-io/cypress/blob/develop/packages/net-stubbing/lib/external-types.ts#L166C3-L198C4)) as parameter and returns a fixture.
+It is useful to adapt the fixture depending on the request (for example, request body or query parameters):
+
+```typescript
+export class AdSetsStub extends ClientStub<AdSetsClient> {
+  constructor() {
+    super(AdSetsClient);
+  }
+
+  endpoints = {
+    getById: this.createEndpoint(
+      this.client.getById,
+      200,
+      // No static fixture provided
+      undefined,
+      {},
+      // Fixture builder function -> builds the fixture depending on the request
+      // (here depending on 'language' query parameter).
+      (req) => (req.query['language'] === 'fr-FR' ?
+        {
+          adSet: {
+            name: "Ceci est mon ensemble d'annonce",
+            // ... other properties
+          },
+        } :
+        {
+          adSet: {
+            name: 'This is my ad set',
+            // ... other properties
+          },
+        }
+      )
+    ),
+  };
+}
+```
+
 #### Intercept
 
 These **endpoints** can then be used in any Cypress test for intercept.
