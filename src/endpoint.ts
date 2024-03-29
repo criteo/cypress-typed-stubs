@@ -2,6 +2,7 @@ import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
 import { Headers, Method, RouteConfig } from './routing';
 import { SpyHttpClient } from './spy-http-client';
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
 
 /**
  * An endpoint definition with methods to get route config and alias
@@ -21,6 +22,27 @@ export abstract class AbstractEndpoint<IN extends unknown[], OUT> {
 
   get alias(): string {
     return '@' + this.routeName;
+  }
+
+  /**
+   * Prepare the fixture or fixture builder to build the route config.
+   *
+   * In the case of a fixture object, it clones it.
+   * In the case of a function (i.e. fixture builder), it doesn't do anything.
+   * @param fixtureOrFixtureBuilder
+   * @private
+   */
+  protected prepareFixtureOrFixtureBuilder(fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT)): OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT) {
+    // In the case of a function (i.e. fixture builder),
+    // we cannot clone it (cloning a function returns an empty object)
+    if (fixtureOrFixtureBuilder instanceof Function) {
+      return fixtureOrFixtureBuilder;
+    }
+
+    // In the case of a fixture object, make sure each call to RouteConfig is "pure",
+    // in the sense each call to defaultConfig always returns the original fixture,
+    // not one that has been modified by a previous call (if it were using the same reference).
+    return cloneDeep(fixtureOrFixtureBuilder);
   }
 }
 
@@ -66,10 +88,34 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
     private readonly actualEndpoint: (...params: IN) => Observable<OUT>,
     parentName: string,
     public statusCode: number,
-    public fixture: OUT,
+    public fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT),
     headers: Headers = {}
   ) {
     super(parentName, headers);
+  }
+
+  /**
+   * Get the fixture object (if endpoint was stubbed with a fixture),
+   * or throw an error (if endpoint was stubbed with a fixture builder function)
+   */
+  public get fixture(): OUT {
+    if (this.fixtureOrFixtureBuilder instanceof Function) {
+      throw new TypeError('Cannot get fixture, endpoint was stubbed with a fixture builder function');
+    } else {
+      return this.fixtureOrFixtureBuilder;
+    }
+  }
+
+  /**
+   * Get the fixture builder function (if endpoint was stubbed with a fixture builder),
+   * or throw an error (if endpoint was stubbed with a fixture object)
+   */
+  public get fixtureBuilder(): (req: CyHttpMessages.IncomingHttpRequest) => OUT {
+    if (this.fixtureOrFixtureBuilder instanceof Function) {
+      return this.fixtureOrFixtureBuilder;
+    } else {
+      throw new TypeError('Cannot get fixture builder, endpoint was stubbed with a fixture object');
+    }
   }
 
   defaultConfig(...userParams: Partial<IN> | []): RouteConfig<OUT> {
@@ -113,10 +159,7 @@ export class Endpoint<C, IN extends unknown[], OUT> extends AbstractEndpoint<IN,
       url,
       _originalUrlForSmokeJS,
       this.statusCode,
-      // Make sure each call to RouteConfig is "pure"
-      // in the sense each call to defaultConfig always return the original fixture,
-      // not one that has been modified by a previous call (if it were using the same reference)
-      cloneDeep(this.fixture),
+      this.prepareFixtureOrFixtureBuilder(this.fixtureOrFixtureBuilder),
       this.headers
     );
   }
@@ -134,7 +177,7 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
 
   statusCode: number;
 
-  fixture: OUT;
+  fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT);
 
   constructor(
     parentName: string,
@@ -142,7 +185,7 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
     url: string | RegExp,
     originalUrlForSmokeJS: string,
     statusCode: number,
-    fixture: OUT,
+    fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT),
     headers: Headers = {}
   ) {
     super(parentName, headers);
@@ -150,7 +193,31 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
     this.url = url;
     this.originalUrlForSmokeJS = originalUrlForSmokeJS;
     this.statusCode = statusCode;
-    this.fixture = fixture;
+    this.fixtureOrFixtureBuilder = fixtureOrFixtureBuilder;
+  }
+
+  /**
+   * Get the fixture (if endpoint was stubbed with a fixture object),
+   * or throw an error (if endpoint was stubbed with a fixture builder function)
+   */
+  public get fixture(): OUT {
+    if (this.fixtureOrFixtureBuilder instanceof Function) {
+      throw new TypeError('Cannot get fixture, endpoint was stubbed with a fixture builder function');
+    } else {
+      return this.fixtureOrFixtureBuilder;
+    }
+  }
+
+  /**
+   * Get the fixture builder (if endpoint was stubbed with a fixture builder function),
+   * or throw an error (if endpoint was stubbed with a fixture object)
+   */
+  public get fixtureBuilder(): (req: CyHttpMessages.IncomingHttpRequest) => OUT {
+    if (this.fixtureOrFixtureBuilder instanceof Function) {
+      return this.fixtureOrFixtureBuilder;
+    } else {
+      throw new TypeError('Cannot get fixture builder, endpoint was stubbed with a fixture object');
+    }
   }
 
   defaultConfig(): RouteConfig<OUT> {
@@ -160,10 +227,7 @@ export class ManualEndpoint<IN extends unknown[], OUT> extends AbstractEndpoint<
       this.url,
       this.originalUrlForSmokeJS,
       this.statusCode,
-      // Make sure each call to RouteConfig is "pure"
-      // in the sense each call to defaultConfig always return the original fixture,
-      // not one that has been modified by a previous call (if it were using the same reference)
-      cloneDeep(this.fixture),
+      this.prepareFixtureOrFixtureBuilder(this.fixtureOrFixtureBuilder),
       this.headers
     );
   }
