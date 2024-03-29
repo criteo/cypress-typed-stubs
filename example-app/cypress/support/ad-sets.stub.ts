@@ -1,5 +1,6 @@
 import { ClientStub } from '../../../src';
-import { AdSetsClient, AdSetStatus, AudienceType } from '../../src/client-generated-by-nswag';
+import { AdSetsClient } from '../../src/client-generated-by-nswag';
+import { adSetEnglish, adSetFrench } from '@cypress/fixtures/ad-sets';
 
 export class AdSetsStub extends ClientStub<AdSetsClient> {
   constructor() {
@@ -10,19 +11,15 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
     getById: this.createEndpoint(
       this.client.getById,
       200,
-      // Everything is typed
-      {
-        adSet: {
-          id: 5,
-          partnerId: 5855,
-          name: 'This is my ad set',
-          description: 'The ad set description is here',
-          startDate: new Date('2020-10-20T22:08:46.683'),
-          conflictDetectionToken: 1607941414927,
-          status: AdSetStatus.Draft,
-          audienceType: AudienceType.Custom,
-        },
-      }
+      // Fixture object is typed
+      adSetEnglish
+    ),
+    getByIdWithFixtureBuilder: this.createEndpoint(
+      this.client.getById,
+      200,
+      // Fixture builder function -> builds the fixture depending on the request
+      // (here depending on 'language' query parameter). The function is typed.
+      (req) => (req.query['language'] === 'fr-FR' ? adSetFrench : adSetEnglish)
     ),
   };
 }
