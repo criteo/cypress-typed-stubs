@@ -30,7 +30,7 @@ describe('Main Page (without the library)', () => {
     cy.get('h1').contains('This is my ad set');
   });
 
-  it('should handled ad set not found', () => {
+  it('should handle ad set not found', () => {
     // Prepare
     cy.intercept('GET', /.*\/campaign-api\/ad-sets\/.*/, {
       statusCode: 404,
@@ -70,7 +70,7 @@ describe('Main Page (with the library)', () => {
     if (getById.fixture?.adSet?.description) cy.get('h2').contains(getById.fixture?.adSet?.description);
   });
 
-  it('should handled ad set not found', () => {
+  it('should handle ad set not found', () => {
     // Prepare
     EndpointHelper.stub(
       getById

@@ -16,8 +16,9 @@ export class EndpointHelper {
     const { route } = routeConfig;
     const interceptor: HttpRequestInterceptor = (req) => {
       AddRequestedUrl(routeConfig.name);
+      const body = route.responseOrResponseBuilder instanceof Function ? route.responseOrResponseBuilder(req) : route.responseOrResponseBuilder;
       const response: GenericStaticResponse<string, OUT> = {
-        body: route.response,
+        body,
         statusCode: route.status,
         headers: {
           ...route.headers,

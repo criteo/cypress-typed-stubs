@@ -1,4 +1,5 @@
-import { cloneDeep } from 'lodash';
+import {cloneDeep} from 'lodash';
+import {CyHttpMessages} from 'cypress/types/net-stubbing';
 
 /**
  * Copied from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/methods/index.d.ts
@@ -63,7 +64,7 @@ export interface RouteWithOriginalUrl extends Route {
  * A route with a stubbed response
  */
 export interface StubbedRoute<OUT> extends Route {
-  response: OUT;
+  responseOrResponseBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT);
   status: number;
   onResponse?: (body: unknown) => void;
   headers?: Headers;
@@ -77,21 +78,21 @@ export class RouteConfig<OUT> {
     // Used to keep track for smokejs fixtures
     public _originalUrlForSmokeJS: string,
     private status: number,
-    private _fixture: OUT,
+    private _fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT),
     private headers: Headers = {}
   ) {}
 
   get route(): StubbedRoute<OUT> {
-    // Important to return something if fixture is null, otherwise will be seen as not-stubbed!
+    // Important to return something if fixture (or fixture builder) is null, otherwise will be seen as not-stubbed!
     const emptyResponse = {};
-    const fixture = this._fixture !== null ? this._fixture : (emptyResponse as OUT);
+    const fixtureOrFixtureBuilder = this._fixtureOrFixtureBuilder !== null ? this._fixtureOrFixtureBuilder : (emptyResponse as OUT);
 
     return {
       url: this.url,
       method: this.method,
       status: this.status,
       headers: this.headers,
-      response: fixture,
+      responseOrResponseBuilder: fixtureOrFixtureBuilder,
       onResponse: (body: unknown) => {
         const logRequest = (parsedBody: unknown) => {
           // eslint-disable-next-line no-console
@@ -136,10 +137,37 @@ export class RouteConfig<OUT> {
   }
 
   /**
-   * Return a copy of the fixture
+   * Return a copy of the fixture, or the fixture builder
    */
-  get fixture(): OUT {
-    return cloneDeep(this._fixture);
+  public get fixtureOrFixtureBuilder(): OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT) {
+    if (this._fixtureOrFixtureBuilder instanceof Function) {
+      return this._fixtureOrFixtureBuilder;
+    }
+    return cloneDeep(this._fixtureOrFixtureBuilder);
+  }
+
+  /**
+   * Return a copy of the fixture (if endpoint was stubbed with a fixture object),
+   * or throw an error (if endpoint was stubbed with a fixture builder function)
+   */
+  public get fixture(): OUT {
+    if (this._fixtureOrFixtureBuilder instanceof Function) {
+      throw new TypeError('Cannot get fixture, endpoint was stubbed with a fixture builder function');
+    } else {
+      return cloneDeep(this._fixtureOrFixtureBuilder);
+    }
+  }
+
+  /**
+   * Get the fixture builder (if endpoint was stubbed with a fixture builder function),
+   * or throw an error (if endpoint was stubbed with a fixture object)
+   */
+  public get fixtureBuilder(): (req: CyHttpMessages.IncomingHttpRequest) => OUT {
+    if (this._fixtureOrFixtureBuilder instanceof Function) {
+      return this._fixtureOrFixtureBuilder;
+    } else {
+      throw new TypeError('Cannot get fixture builder, endpoint was stubbed with a fixture object');
+    }
   }
 
   /**
@@ -153,12 +181,21 @@ export class RouteConfig<OUT> {
   }
 
   /**
-   * Override the initial fixture
-   * @param override
+   * Override the initial fixture.
+   *
+   * If a fixture builder was provided, a new fixture builder function is created
+   * that calls the initial fixture builder and then merges the result with the override.
+   * @param override the override object (a partial fixture)
    */
   withOverride(override: Partial<OUT>): this {
-    this._fixture = RouteConfig.mergeFixtures(this._fixture, override);
-
+    if (this._fixtureOrFixtureBuilder instanceof Function) {
+      const fixtureBuilder = this._fixtureOrFixtureBuilder;
+      this._fixtureOrFixtureBuilder = (req: CyHttpMessages.IncomingHttpRequest) => {
+        return RouteConfig.mergeFixtures(fixtureBuilder(req), override);
+      };
+    } else {
+      this._fixtureOrFixtureBuilder = RouteConfig.mergeFixtures(this._fixtureOrFixtureBuilder, override);
+    }
     return this;
   }
 
@@ -173,12 +210,21 @@ export class RouteConfig<OUT> {
   }
 
   /**
-   * Map the existing fixture to something different
+   * Map the existing fixture to something different.
+   *
+   * If a fixture builder was provided, a new fixture builder function is created
+   * that calls the initial fixture builder and then maps the result with the provided mapper.
    * @param mapper the mapping function
    */
   mappingFixture(mapper: (fixture: OUT) => OUT): this {
-    this._fixture = mapper(this._fixture);
-
+    if (this._fixtureOrFixtureBuilder instanceof Function) {
+      const fixtureBuilder = this._fixtureOrFixtureBuilder;
+      this._fixtureOrFixtureBuilder = (req: CyHttpMessages.IncomingHttpRequest) => {
+        return mapper(fixtureBuilder(req));
+      };
+    } else {
+      this._fixtureOrFixtureBuilder = mapper(this._fixtureOrFixtureBuilder);
+    }
     return this;
   }
 

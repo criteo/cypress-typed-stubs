@@ -31,11 +31,13 @@ export class AdSetsClient extends GeneratedClient {
         this.baseUrl = baseUrl ? baseUrl : "";
     }
 
-  getById(adSetId: number, adSetName: string): Observable<GetAdSetDetailsResponse | null> {
-    let url_ = this.baseUrl + "/campaign-api/ad-sets/{adSetId}";
+  getById(adSetId: number, language?: string | null | undefined): Observable<GetAdSetDetailsResponse | null> {
+    let url_ = this.baseUrl + "/campaign-api/ad-sets/{adSetId}?";
     if (adSetId === undefined || adSetId === null)
       throw new Error("The parameter 'adSetId' must be defined.");
     url_ = url_.replace("{adSetId}", encodeURIComponent("" + adSetId));
+    if (language !== undefined && language !== null)
+      url_ += "language=" + encodeURIComponent("" + language) + "&";
     url_ = url_.replace(/[?&]$/, "");
 
     let options_ : any = {
@@ -66,7 +68,7 @@ export class AdSetsClient extends GeneratedClient {
       response instanceof HttpResponse ? response.body :
         (<any>response).error instanceof Blob ? (<any>response).error : undefined;
 
-    let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }};
+    let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
     if (status === 200) {
       return blobToText(responseBlob).pipe(_observableMergeMap(_responseText => {
         let result200: any = null;
