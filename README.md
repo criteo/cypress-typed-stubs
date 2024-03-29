@@ -118,6 +118,40 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
 }
 ```
 
+Instead of a fixture, you can provide a fixture builder: it is a function that takes a cypress request object ([CyHttpMessages.IncomingHttpRequest](https://github.com/cypress-io/cypress/blob/develop/packages/net-stubbing/lib/external-types.ts#L166C3-L198C4)) as parameter and returns a fixture.
+It is useful to adapt the fixture depending on the request (for example, request body or query parameters):
+
+```typescript
+export class AdSetsStub extends ClientStub<AdSetsClient> {
+  constructor() {
+    super(AdSetsClient);
+  }
+
+  endpoints = {
+    getById: this.createEndpoint(
+      this.client.getById,
+      200,
+      // Fixture builder function -> builds the fixture depending on the request
+      // (here depending on 'language' query parameter). The function is typed.
+      (req) => (req.query['language'] === 'fr-FR' ?
+        {
+          adSet: {
+            name: "Ceci est mon ensemble d'annonce",
+            // ... other properties
+          },
+        } :
+        {
+          adSet: {
+            name: 'This is my ad set',
+            // ... other properties
+          },
+        }
+      )
+    ),
+  };
+}
+```
+
 #### Intercept
 
 These **endpoints** can then be used in any Cypress test for intercept.
@@ -145,13 +179,13 @@ The endpoint is now stubbed by Cypress with a name automatically generated
 
 The stub can be adapted based on the default configuration:
 
-- change HTTP status
+- change HTTP status:
 
 ```typescript
 EndpointHelper.stub(getById.defaultConfig().withStatusCode(500));
 ```
 
-- adapt the fixture. Mapping is type checked
+- adapt the fixture (mapping is type checked):
 
 ```typescript
 EndpointHelper.stub(
@@ -164,7 +198,10 @@ EndpointHelper.stub(
 );
 ```
 
-- replace the fixture entirely. Overwrite is type checked
+If the endpoint was initially stubbed with a fixture builder,
+the provided mapping function is applied to the result of the fixture builder function.
+
+- replace the fixture entirely (override object is type checked):
 
 ```typescript
 EndpointHelper.stub(
@@ -179,7 +216,10 @@ EndpointHelper.stub(
 );
 ```
 
-- set HTTP headers
+If the endpoint was initially stubbed with a fixture builder,
+the provided object overrides the result of the fixture builder function.
+
+- set HTTP headers:
 
 ```typescript
 EndpointHelper.stub(
@@ -189,7 +229,7 @@ EndpointHelper.stub(
 );
 ```
 
-- adaptations can be combined with fluent syntax
+- adaptations can be combined with fluent syntax:
 
 ```typescript
 EndpointHelper.stub(getById.defaultConfig().withStatusCode(500).withOverride({}).withHeaders({ traceId: '12345' }));
