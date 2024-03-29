@@ -1,6 +1,6 @@
 import { EndpointHelper } from '../../../src';
 import { AdSetsStub } from '../support/ad-sets.stub';
-import {AdSetStatus, AudienceType} from "../../src/client-generated-by-nswag";
+import { AdSetStatus, AudienceType } from '../../src/client-generated-by-nswag';
 
 describe('Features', () => {
   const stub = new AdSetsStub().init();
@@ -40,15 +40,17 @@ describe('Features', () => {
   it('should override fixture returned by fixture builder', () => {
     // Prepare
     // Get the default config with fixture builder and override it
-    EndpointHelper.stub(getByIdWithFixtureBuilder.defaultConfig().withOverride({
-      adSet: {
-        id: 5,
-        name: 'Ceci est mon ensemble d\'annonce modifié',
-        conflictDetectionToken: 1607941414927,
-        status: AdSetStatus.Live,
-        audienceType: AudienceType.Similar,
-      }
-    }));
+    EndpointHelper.stub(
+      getByIdWithFixtureBuilder.defaultConfig().withOverride({
+        adSet: {
+          id: 5,
+          name: "Ceci est mon ensemble d'annonce modifié",
+          conflictDetectionToken: 1607941414927,
+          status: AdSetStatus.Live,
+          audienceType: AudienceType.Similar,
+        },
+      })
+    );
 
     // Visit page
     cy.visit('http://localhost:4200');
@@ -76,13 +78,14 @@ describe('Features', () => {
   it('should map fixture returned by fixture builder', () => {
     // Prepare
     // Get the default config with fixture builder
-    EndpointHelper.stub(getByIdWithFixtureBuilder.defaultConfig().mappingFixture((fixture) => {
-      if(fixture?.adSet?.name !== undefined)
-      {
-        fixture.adSet.name = fixture.adSet.name.toUpperCase();
-      }
-      return fixture;
-    }));
+    EndpointHelper.stub(
+      getByIdWithFixtureBuilder.defaultConfig().mappingFixture((fixture) => {
+        if (fixture?.adSet?.name !== undefined) {
+          fixture.adSet.name = fixture.adSet.name.toUpperCase();
+        }
+        return fixture;
+      })
+    );
 
     // Visit page
     cy.visit('http://localhost:4200');

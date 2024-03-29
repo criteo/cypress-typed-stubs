@@ -1,8 +1,8 @@
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
 import { cloneDeep } from 'lodash';
 import { Observable } from 'rxjs';
 import { Headers, Method, RouteConfig } from './routing';
 import { SpyHttpClient } from './spy-http-client';
-import { CyHttpMessages } from 'cypress/types/net-stubbing';
 
 /**
  * An endpoint definition with methods to get route config and alias
@@ -32,7 +32,9 @@ export abstract class AbstractEndpoint<IN extends unknown[], OUT> {
    * @param fixtureOrFixtureBuilder
    * @private
    */
-  protected prepareFixtureOrFixtureBuilder(fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT)): OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT) {
+  protected prepareFixtureOrFixtureBuilder(
+    fixtureOrFixtureBuilder: OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT)
+  ): OUT | ((req: CyHttpMessages.IncomingHttpRequest) => OUT) {
     // In the case of a function (i.e. fixture builder),
     // we cannot clone it (cloning a function returns an empty object)
     if (fixtureOrFixtureBuilder instanceof Function) {

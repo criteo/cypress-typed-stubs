@@ -24,9 +24,9 @@ Compatibility table:
 | Angular version | Cypress version | cypress-typed-stubs version |
 | --------------- | --------------- | --------------------------- |
 | 11              | <9              | 2                           |
-| 11              | 9               | 3.0.0-beta.4                |
-| 13              | 9               | 4.0.0-beta.7                |
-| 15              | 9               | 5.0.0                       |
+| 11              | 9+              | 3                           |
+| 13              | 9+              | 4                           |
+| 15              | 9+              | 5                           |
 
 ```shell
 npm install --save-dev cypress-typed-stubs
@@ -133,20 +133,20 @@ export class AdSetsStub extends ClientStub<AdSetsClient> {
       200,
       // Fixture builder function -> builds the fixture depending on the request
       // (here depending on 'language' query parameter). The function is typed.
-      (req) => (req.query['language'] === 'fr-FR' ?
-        {
-          adSet: {
-            name: "Ceci est mon ensemble d'annonce",
-            // ... other properties
-          },
-        } :
-        {
-          adSet: {
-            name: 'This is my ad set',
-            // ... other properties
-          },
-        }
-      )
+      (req) =>
+        req.query['language'] === 'fr-FR'
+          ? {
+              adSet: {
+                name: "Ceci est mon ensemble d'annonce",
+                // ... other properties
+              },
+            }
+          : {
+              adSet: {
+                name: 'This is my ad set',
+                // ... other properties
+              },
+            }
     ),
   };
 }

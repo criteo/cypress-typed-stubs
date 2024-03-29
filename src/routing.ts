@@ -1,5 +1,5 @@
-import {cloneDeep} from 'lodash';
-import {CyHttpMessages} from 'cypress/types/net-stubbing';
+import { CyHttpMessages } from 'cypress/types/net-stubbing';
+import { cloneDeep } from 'lodash';
 
 /**
  * Copied from https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/methods/index.d.ts
@@ -85,7 +85,8 @@ export class RouteConfig<OUT> {
   get route(): StubbedRoute<OUT> {
     // Important to return something if fixture (or fixture builder) is null, otherwise will be seen as not-stubbed!
     const emptyResponse = {};
-    const fixtureOrFixtureBuilder = this._fixtureOrFixtureBuilder !== null ? this._fixtureOrFixtureBuilder : (emptyResponse as OUT);
+    const fixtureOrFixtureBuilder =
+      this._fixtureOrFixtureBuilder !== null ? this._fixtureOrFixtureBuilder : (emptyResponse as OUT);
 
     return {
       url: this.url,
